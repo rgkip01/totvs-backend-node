@@ -3,8 +3,14 @@ const Defaulting = require('../models/defaulting.model');
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  console.log(req.body)
-  Defaulting.find({}, (err, defaultings) =>{
+  Defaulting.find(
+    {
+      name: {
+        $regex: req.query.search || '',
+        $options: 'i'
+      }
+    }, (err, defaultings) =>{
+    
     res.json(defaultings)
   })
 })
@@ -39,5 +45,16 @@ router.delete('/:id', (req, res) => {
     res.json({'message':'deleted'})
   })
 })
+
+router.get('/order', async (req, res, next) => {
+  Defaulting.find({}).sort(req.query.order).exec((err, filter)=> {
+    if(err) {
+      next(err);
+    } else {
+      res.json(filter)
+    }
+  })
+})
+
 
 module.exports = router;
